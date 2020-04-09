@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>UFPI</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+      
+      
+
+      <script type="text/javascript">
+      google.charts.load('current', {packages: ['corechart', 'line']});
+      google.charts.setOnLoadCallback(drawLineColors);
+
+      const round = (num, places) => {
+        if (!("" + num).includes("e")) {
+          return +(Math.round(num + "e+" + places)  + "e-" + places);
+        } else {
+          let arr = ("" + num).split("e");
+          let sig = ""
+          if (+arr[1] + places > 0) {
+            sig = "+";
+          }
+
+          return +(Math.round(+arr[0] + "e" + sig + (+arr[1] + places)) + "e-" + places);
+        }
+      }
+
+
+    function drawLineColors() {
+      var data = new google.visualization.DataTable();
+      var qtdinicial = parseFloat(document.getElementById("qtdinicial").value);
+      var porcentagemUti = parseFloat(document.getElementById("porcentagemUti").value);
+      var qtddia1 = parseFloat(document.getElementById("qtddia1").value);
+      var qtdfinal1 = parseFloat(document.getElementById("qtdfinal1").value);
+      var semandasdias = parseFloat(document.getElementById("semandasdias").value); 
+      var porcentagemMortalidade = parseFloat(document.getElementById("porcentagemMortalidade").value);
+      var projecaodia = parseFloat(document.getElementById("projecaodia").value);
+      var variacao = ((qtdfinal1-qtddia1)/semandasdias).toFixed( 2 );
+
+      data.addColumn('number', 'Dias');
+      data.addColumn('number', 'Casos');
+      data.addColumn('number', 'UTI');
+      data.addColumn('number', 'Mortalidade');
+      vetor = new Array();
+      
+      var casos = qtdinicial;
+      for (let i = 0; i < projecaodia+1; i++) {
+       
+          casos = parseFloat(parseFloat(casos)+parseFloat(variacao)).toFixed( 2 );
+          var c1 = Math.round(casos);
+        
+         
+          var uti = (c1*(porcentagemUti/100)).toFixed( 2 );
+          var ut1 = Math.round(uti);
+          var mortalidade = (c1*(porcentagemMortalidade/100)).toFixed( 2 );
+          var mortalidade1 = Math.round(mortalidade);
+          vetor[i]= [i,c1,ut1,mortalidade1];
+      }
+    
+      //segue a ordem das colunas
+      data.addRows(
+       vetor
+      );
+      var options = {
+        hAxis: {
+          title: 'Dias'
+        },
+        vAxis: {
+          title: 'Casos'
+        },
+        colors: ['#000099', '#097138', '#a52714']
+      };
+      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+      chart.draw(data, options);
+    }
+
+    function onClickCalcular(){
+      google.charts.load('current', {packages: ['corechart', 'line']});
+      google.charts.setOnLoadCallback(drawLineColors);
+    
+    
+    }
+    
+    </script>
+    </head>
+    <body>
+      <div class="container" style="margin-top: 2%;">
+   <div class="row" style="text-align: center;">  
+    <div class="form-group col-lg-2">
+      <label for="qtdinicial">QTD casos iniciais</label>
+      <input type="number" name="qtdinicial" class="form-control" id="qtdinicial">
+    </div>
+    <div class="form-group col-lg-2">
+      <label for="porcentagemUti">% UTI</label>
+      <input type="number" name="porcentagemUti" class="form-control" id="porcentagemUti">
+    </div>
+    <div class="form-group col-lg-2">
+      <label for="qtddia1">QTD casos 1º dia</label>
+      <input type="number" name="qtddia1" class="form-control" id="qtddia1">
+    </div>
+    <div class="form-group col-lg-2">
+      <label for="qtdfinal1">QTD Casos últmo dia</label>
+      <input type="number" name="qtdfinal1" class="form-control" id="qtdfinal1">
+    </div>
+    <div class="form-group col-lg-2">
+      <label for="semandasdias">QTD dias</label>
+      <input type="number" name="semandasdias" class="form-control" id="semandasdias">
+    </div>
+    <div class="form-group col-lg-2">
+      <label for="porcentagemMortalidade">% mortalidade</label>
+      <input type="number" name="porcentagemMortalidade" class="form-control" id="porcentagemMortalidade">
+    </div>
+    
+     
+</div>  
+<div class="row">
+  <div class="form-group col-lg-2">
+    <label for="projecaodia">Projeção de dias</label>
+    <input type="number" name="projecaodia" class="form-control" id="projecaodia">
+  </div>
+  <div class="form-group col-lg-2">
+    
+    <button id="btncalcular"  type="button" class="btn btn-primary">Calcular</button>
+  </div>
+</div>  
+    <div class="row" id="grafico">
+      <div class="form-group col-lg-12"></div>
+      <div id="chart_div" style="height: 100%; width: 100%;"></div>
+      </div>
+    </div>
+          
+    </div>
+      <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    </body>
+    <script>
+      $(document).ready(function(){
+      $("#btncalcular").click(function(){
+        google.charts.load('current', {packages: ['corechart', 'line']});
+      google.charts.setOnLoadCallback(drawLineColors);
+     
+      });
+    });
+    </script>
+  </html>
+  
